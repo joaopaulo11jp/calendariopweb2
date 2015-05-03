@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+<<<<<<< HEAD
     <wb-module deploy-name="CalendarioPweb2">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <property name="context-root" value="calendario"/>
         <property name="java-output-path" value="/CalendarioPweb2/build/classes"/>
+=======
+    <wb-module deploy-name="CalendarioWeb2">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <property name="context-root" value="CalendarioWeb2"/>
+        <property name="java-output-path" value="/CalendarioWeb2/build/classes"/>
+>>>>>>> 0d9c4ddfff9b59738907af1f6c7f2951e616ec6b
     </wb-module>
 </project-modules>
