@@ -13,7 +13,7 @@ public class DAOUsuario extends DAO<Usuario>{
 		super();
 	}
 	
-	public Usuario listUsuario(String usuario){
+	public Usuario readUsuario(String usuario){
 		Usuario usuarios = null;
 		
 		Query q = manager.createQuery("select u from Usuario u where u.login = :login");
@@ -28,7 +28,7 @@ public class DAOUsuario extends DAO<Usuario>{
 		
 	}
 	
-	public Usuario readUsuario(String usuario, String senha){
+	public Usuario authenticateUsuario(String usuario, String senha){
 		
 		
 		Query q = manager.createQuery("select u from Usuario u where u.login = :l AND u.senha = :s");

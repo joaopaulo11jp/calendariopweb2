@@ -8,26 +8,21 @@ import javax.persistence.Query;
 import br.edu.ifpb.pweb2.calendario.model.Evento;
 
 public class DAOEvento extends DAO<Evento>{
-	
 		public DAOEvento(){
 			super();
 		}
 	
-	public List<Evento> readEventoByMonth(int month){
-		List<Evento> eventos = null;
+	@SuppressWarnings("unchecked")
+	public List<Evento> readEventoByMonthAndYear(int mes, int ano){
 		
-	
-		Query q = manager.createQuery("select e from Evento e where e.mes = :m");
-		q.setParameter("m", month);
+		Query q = manager.createQuery("select e from Evento e where e.mes = :m and e.ano = :a");
+		q.setParameter("m", mes);
+		q.setParameter("a", ano);
 		
 		try{
-			eventos = q.getResultList();
-			return eventos;
+			return q.getResultList();
 		}catch(NoResultException e){
 			return null;
 		}
-		
 	}
-	
-	
 }

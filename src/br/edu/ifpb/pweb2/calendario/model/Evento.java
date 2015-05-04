@@ -25,7 +25,11 @@ public class Evento {
 		}
 		
 		public Evento(){}
-
+	
+	public int getId(){
+		return this.id;
+	}
+		
 	public int getDia() {
 		return dia;
 	}
