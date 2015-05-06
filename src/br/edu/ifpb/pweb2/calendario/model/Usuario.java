@@ -3,10 +3,12 @@ package br.edu.ifpb.pweb2.calendario.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 @Entity
 public class Usuario {
 	@Id
@@ -16,6 +18,7 @@ public class Usuario {
 	private String nome;
 	private String senha;
 	private boolean adminRight;
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="usuario")
 	private List<Evento> eventos;
 	
 		public Usuario(String login,String nome,String senha){
@@ -60,6 +63,10 @@ public class Usuario {
 
 	public void setEventos(List<Evento> eventos) {
 		this.eventos = eventos;
+	}
+	
+	public void addEvento(Evento evento){
+		this.eventos.add(evento);
 	}
 	
 	

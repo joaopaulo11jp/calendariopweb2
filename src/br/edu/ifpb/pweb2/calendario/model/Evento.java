@@ -1,11 +1,15 @@
 package br.edu.ifpb.pweb2.calendario.model;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 public class Evento {
@@ -15,13 +19,20 @@ public class Evento {
 	private int dia;
 	private int mes;
 	private int ano;
-	private Date data;
+	@ManyToOne
+	private Usuario usuario;
+	@Temporal(TemporalType.DATE)
+	private GregorianCalendar dataInicial;
+	@Temporal(TemporalType.DATE)
+	private GregorianCalendar dataFinal;
 	
-		public Evento(int dia, int mes, int ano, Date data){
+	
+		public Evento(int dia, int mes, int ano, GregorianCalendar dataInicial,GregorianCalendar dataFinal){
 			this.dia = dia;
 			this.mes = mes;
 			this.ano = ano;
-			this.data = data;
+			this.dataInicial = dataFinal;
+			this.dataFinal = dataFinal;
 		}
 		
 		public Evento(){}
@@ -54,13 +65,34 @@ public class Evento {
 		this.ano = ano;
 	}
 
-	public Date getData() {
-		return data;
+
+	
+	public GregorianCalendar getDataInicial() {
+		return dataInicial;
 	}
 
-	public void setData(Date data) {
-		this.data = data;
+	public void setDataInicial(GregorianCalendar dataInicial) {
+		this.dataInicial = dataInicial;
 	}
-	
-	
+
+	public GregorianCalendar getDataFinal() {
+		return dataFinal;
+	}
+
+	public void setDataFinal(GregorianCalendar dataFinal) {
+		this.dataFinal = dataFinal;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
 }
