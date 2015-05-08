@@ -1,5 +1,7 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
 	<meta charset="UTF-8">
 	<title>CalendarioWeb</title>
@@ -59,18 +61,19 @@
   </div>
   <div class="panel-body">
 
-<form method='POST' action='#'>
+<form method='POST' action='Calendario.do'>
   <div class="form-group">
     <i class="fa fa-user fa-2x" id='userIcon'></i><input type="text" class="form-control" id="userLabel" placeholder="Username" name='login'>
   </div>
   <div class="form-group">
     <i class="fa fa-lock fa-2x" id='passIcon'></i><input type="password" class="form-control" id="passwordLabel" placeholder="Password" name='senha'>
   </div>
-  
- <button type="submit" class="btn btn-primary" id='btnSignIn'>Sign In</button>
- <a href="cadastro.jsp" class="btn btn-default" role="button" id='btnSignUp'>Sign Up</a>
+  <input type='hidden' name='action' value='2'/>
+ <button type="submit" class="btn btn-primary" id='btnSignIn'>Login</button>
+ <a href="cadastro.jsp" class="btn btn-default" role="button" id='btnSignUp'>Cadastre-se</a>
 </form>
   </div>
+  <p><font color='red'><b>${error }</b></font></p>
 </div>
 
 </body>

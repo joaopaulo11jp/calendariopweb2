@@ -1,11 +1,9 @@
 package br.edu.ifpb.pweb2.calendario.dao;
 
-import java.io.File;
-import java.io.IOException;
+
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import br.edu.ifpb.pweb2.calendario.model.*;
 
 import javax.persistence.*;
 

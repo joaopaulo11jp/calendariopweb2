@@ -5,7 +5,7 @@ import java.util.List;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import br.edu.ifpb.pweb2.calendario.model.Evento;
+import br.edu.ifpb.pweb2.calendario.model.Anotacao;
 import br.edu.ifpb.pweb2.calendario.model.Usuario;
 
 public class DAOUsuario extends DAO<Usuario>{
@@ -14,14 +14,14 @@ public class DAOUsuario extends DAO<Usuario>{
 	}
 	
 	public Usuario readUsuario(String usuario){
-		Usuario usuarios = null;
+		Usuario user = null;
 		
 		Query q = manager.createQuery("select u from Usuario u where u.login = :login");
 		q.setParameter("login", usuario);
 		
 		try {
-			usuarios = (Usuario) q.getResultList();
-			return usuarios;
+			user = (Usuario) q.getSingleResult();
+			return user;
 		}catch(NoResultException e){
 			return null;
 		}
@@ -43,8 +43,8 @@ public class DAOUsuario extends DAO<Usuario>{
 		}
 		
 	}
-	
-	public List<Evento> readEventosUsuario(int i, int m){
+	@SuppressWarnings("unchecked")
+	public List<Anotacao> readEventosUsuario(int i, int m){
 		Query q = manager.createQuery("SELECT u.eventos FROM Usuario u where u.id = :i AND u.eventos.mes = :m");
 		q.setParameter("i", i);
 		q.setParameter("m", m);

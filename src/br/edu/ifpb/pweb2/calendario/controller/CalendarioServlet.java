@@ -17,26 +17,74 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import br.edu.ifpb.pweb2.calendario.dao.DAO;
-import br.edu.ifpb.pweb2.calendario.dao.DAOEvento;
+import br.edu.ifpb.pweb2.calendario.dao.DAOAnotacao;
 import br.edu.ifpb.pweb2.calendario.dao.DAOUsuario;
-import br.edu.ifpb.pweb2.calendario.model.Evento;
+import br.edu.ifpb.pweb2.calendario.model.Anotacao;
 import br.edu.ifpb.pweb2.calendario.model.Usuario;
 import br.edu.ifpb.pweb2.calendario.utils.Util;
 
 
 
-@WebServlet({ "/CalendarioServlet", "/Calendario.do" })
+@WebServlet({ "/CalendarioServlet", "/Calendario.do","/index.jsp" })
 public class CalendarioServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private DAOUsuario daousuario = (DAOUsuario) this.getServletContext().getAttribute("daousuario");
-	private DAOEvento daoevento = (DAOEvento) this.getServletContext().getAttribute("daoevento");
+	private static DAOUsuario daousuario;
+	private static DAOAnotacao daoanotacao;
        
+	
+	static{
+		daousuario = new DAOUsuario();
+		daoanotacao = new DAOAnotacao();
+	}
+	
     public CalendarioServlet() {
         super();
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher("index.jsp").forward(request, response);
+		HttpSession session = request.getSession(false);
+		
+		if(request.getParameter("logout") != null){
+			if(request.getParameter("logout").equals("true") && session != null){
+					session.invalidate();
+					
+					request.getRequestDispatcher("calendario.jsp").forward(request, response);
+			}else{
+					request.getRequestDispatcher("calendario.jsp").forward(request, response);
+			}
+		}else if(request.getParameter("gerenciaanotacoes") != null){
+			Usuario usuario = null;
+			if(session != null){
+			usuario = (Usuario) session.getAttribute("usuario");
+			}
+			
+			request.setAttribute("usuario",usuario);
+			request.getRequestDispatcher("gerenciaanotacoes.jsp").forward(request, response);
+			
+		}else if(request.getParameter("mudasenha") != null){
+			if(session != null){
+				request.setAttribute("usuario", (Usuario) session.getAttribute("usuario"));
+				request.getRequestDispatcher("alterarsenha.jsp").forward(request,response);
+			}else{
+				request.getRequestDispatcher("calendario.jsp").forward(request, response);
+			}
+		}else if(request.getParameter("exclui") != null){
+			if(session != null){
+				task_excluirUsuario(daousuario.read((Integer)((Usuario)session.getAttribute("usuario")).getId()));
+				
+				session.invalidate();
+				request.getRequestDispatcher("calendario.jsp").forward(request, response);
+			}else{
+				request.getRequestDispatcher("calendario.jsp").forward(request, response);
+			}
+		}else{
+		
+			session = request.getSession(false);
+		
+			if(session != null) request.setAttribute("usuario", (Usuario) session.getAttribute("usuario"));
+			
+			request.getRequestDispatcher("calendario.jsp").forward(request, response);
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -48,7 +96,7 @@ public class CalendarioServlet extends HttpServlet {
 				try{
 					task_cadastrarUsuario(request.getParameter("nome"),request.getParameter("login"),request.getParameter("senha"));
 					
-					request.getRequestDispatcher("index.jsp").forward(request, response);
+					request.getRequestDispatcher("calendario.jsp").forward(request, response);
 				}catch(Exception e){
 					request.setAttribute("error", e.getMessage());
 					request.getRequestDispatcher("cadastro.jsp").forward(request, response);
@@ -56,11 +104,13 @@ public class CalendarioServlet extends HttpServlet {
 				break;
 			case "2":// Fazer login
 				try{
-					Usuario usuario = task_efetuarLogin(request.getParameter("login"),request.getParameter("senha"));
-					session = request.getSession();
-					session.setAttribute("usuario",usuario);
-					
-					request.getRequestDispatcher("index.jsp").forward(request, response);
+				    
+				    	Usuario usuario = task_efetuarLogin(request.getParameter("login"),request.getParameter("senha"));
+				    	
+				    	session = request.getSession();
+				    	session.setAttribute("usuario", usuario);
+				    	request.setAttribute("usuario",usuario);
+				    	request.getRequestDispatcher("calendario.jsp").forward(request, response);
 				}catch(Exception e){
 					request.setAttribute("error", e.getMessage());
 					request.getRequestDispatcher("login.jsp").forward(request, response);
@@ -72,42 +122,49 @@ public class CalendarioServlet extends HttpServlet {
 				  try{
 					task_alterarSenha((Usuario)session.getAttribute("usuario"),request.getParameter("senhaAnterior"),request.getParameter("novaSenha"));
 					
-					request.getRequestDispatcher("index.jsp").forward(request, response);
+					session.setAttribute("usuario", daousuario.read((Integer) ((Usuario) session.getAttribute("usuario")).getId()));
+					request.setAttribute("usuario", (Usuario)session.getAttribute("usuario"));
+					request.getRequestDispatcher("calendario.jsp").forward(request, response);
 				  }catch(Exception e){
 					request.setAttribute("error", e.getMessage());
+					request.setAttribute("usuario", (Usuario) session.getAttribute("usuario"));
 					request.getRequestDispatcher("alterarsenha.jsp").forward(request, response);	
 				  }
 				}
 				break;
-			case "4"://Registrar evento
+			case "4"://Registrar anotacao
 				session = request.getSession(false);
 				if(session != null){
-				  try{
-					String dataInicial = request.getParameter("dataInicial");
-					String dataFinal = request.getParameter("dataFinal");
+				 try{	
+					DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/YYYY").withOffsetParsed();
+					DateTime dateTime = formatter.parseDateTime(request.getParameter("data"));
+					GregorianCalendar data = dateTime.toGregorianCalendar();
 					
-					DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/mm/YYYY").withOffsetParsed();
-						
-					DateTime dateTime = formatter.parseDateTime(dataInicial);
-					DateTime dateTime2 = formatter.parseDateTime(dataFinal);
-					
-					task_registrarEvento(dateTime.toGregorianCalendar(),dateTime2.toGregorianCalendar(),(Usuario)session.getAttribute("usuario"));  
-				  }catch(Exception e){
-					  request.setAttribute("error", e.getMessage());
-					  request.getRequestDispatcher("gerenciaevento.jsp").forward(request, response);
-				  }
-				}
+					task_registrarAnotacao(data,request.getParameter("titulo"),request.getParameter("texto"),(Usuario) session.getAttribute("usuario"));
+					session.setAttribute("usuario", daousuario.read((Integer) ((Usuario) session.getAttribute("usuario")).getId()));
+					request.setAttribute("usuario", (Usuario)session.getAttribute("usuario"));
+					request.getRequestDispatcher("gerenciaanotacoes.jsp").forward(request, response);
+				 }catch(Exception e){
+					 request.setAttribute("error", e.getMessage());
+					 request.getRequestDispatcher("calendario.jsp").forward(request, response);//TODO Rever dps
+				 }
+				}	
+				break;
 			case "5"://Excluir evento
 				session = request.getSession(false);
 				if(session != null){
-					task_excluirEvento(Integer.parseInt(request.getParameter("id")));
+					task_excluirAnotacao(Integer.parseInt(request.getParameter("id")));
+					session.setAttribute("usuario", daousuario.read((Integer) ((Usuario) session.getAttribute("usuario")).getId()));
+					request.setAttribute("usuario", (Usuario)session.getAttribute("usuario"));
+					request.getRequestDispatcher("gerenciaanotacoes.jsp").forward(request, response);
+				}
+				
 					
-					request.getRequestDispatcher("gerenciaevento.jsp").forward(request, response);
-				}	
+				}
+		
 			}
 		}
 
-	}
 
 	
 	private void task_cadastrarUsuario(String nome,String login, String senha) throws Exception{
@@ -143,32 +200,40 @@ public class CalendarioServlet extends HttpServlet {
 		
 	}
 	
-	private void task_registrarEvento(GregorianCalendar dataInicial, GregorianCalendar dataFinal,Usuario usuario){
-			Calendar dataI = dataInicial;
-			Calendar dataF = dataFinal;
+	private void task_registrarAnotacao(GregorianCalendar dataAnot,String titulo,String texto,Usuario usuario){
+			Calendar data = dataAnot;
 			
-			Evento evento = new Evento();
-			
-			usuario.addEvento(new Evento(dataI.get(Calendar.DAY_OF_MONTH) ,dataI.get(Calendar.MONTH),dataI.get(Calendar.YEAR),dataInicial,dataFinal));
-			
+			Anotacao anotacao = new Anotacao(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.MONTH)+1,data.get(Calendar.YEAR),data,titulo,texto);
+			Usuario user = daousuario.read((Integer)usuario.getId());
+		    anotacao.setUsuario(user);
+			user.getAnotacoes().add(anotacao);
 			DAO.begin();
-			daousuario.update(usuario);	
+			daoanotacao.create(anotacao);
+			daousuario.update(user);
 			DAO.commit();
 
 	}
 	
-	private void task_excluirEvento(Integer id){
+	private void task_excluirAnotacao(Integer id){
 		DAO.begin();
-		Evento evento = daoevento.read(id);
-		Usuario usuario = daousuario.read(evento.getUsuario().getId());
-		usuario.getEventos().remove(evento);
+		Anotacao anotacao = daoanotacao.read(id);
+		Usuario usuario = daousuario.read(anotacao.getUsuario().getId());
+		usuario.getAnotacoes().remove(anotacao);
 		daousuario.update(usuario);
-		daoevento.delete(evento);
+		daoanotacao.delete(anotacao);
 		DAO.commit();
 	}
-	private List<Evento> task_buscarEventos(Usuario usuario){
-		return daoevento.readEventoByUser(usuario);
+	private List<Anotacao> task_buscarEventos(Usuario usuario){
+		return daoanotacao.readAnotacaoByUser(usuario);
 	}
+	
+	private void task_excluirUsuario(Usuario usuario){
+		
+		DAO.begin();
+		 daousuario.delete(usuario);
+		DAO.commit();
+	}
+	
 	
 }
 

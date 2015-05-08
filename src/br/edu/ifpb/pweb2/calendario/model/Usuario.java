@@ -17,21 +17,24 @@ public class Usuario {
 	private String login;
 	private String nome;
 	private String senha;
-	private boolean adminRight;
 	@OneToMany(cascade=CascadeType.ALL, mappedBy="usuario")
-	private List<Evento> eventos;
+	private List<Anotacao> anotacoes;
 	
 		public Usuario(String login,String nome,String senha){
 			this.login = login;
 			this.nome = nome;
 			this.senha = senha;
-		    this.eventos = new ArrayList<Evento>();
+		    this.anotacoes = new ArrayList<Anotacao>();
 		}
 		
 		public Usuario(){}
 		
 	public int getId(){
 		return this.id;
+	}
+	
+	public void setId(int id){
+		this.id = id;
 	}
 	
 	public String getLogin() {
@@ -57,16 +60,12 @@ public class Usuario {
 		this.senha = senha;
 	}
 
-	public List<Evento> getEventos() {
-		return eventos;
+	public List<Anotacao> getAnotacoes() {
+		return anotacoes;
 	}
 
-	public void setEventos(List<Evento> eventos) {
-		this.eventos = eventos;
-	}
-	
-	public void addEvento(Evento evento){
-		this.eventos.add(evento);
+	public void setAnotacoes(List<Anotacao> anotacoes) {
+		this.anotacoes = anotacoes;
 	}
 	
 	
